@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Comparative Vis</title>
+		<script type="text/javascript" src="js/d3/d3.min.js"></script>
+    <script  src="https://code.jquery.com/jquery-2.2.4.min.js"  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="  crossorigin="anonymous"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.0.1/spin.min.js'></script> 
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-zoom/1.7.1/d3-zoom.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
+    <script src="scalenode.js"></script>
+    <script src="js/vendor/bootstrap-toggle.min.js"></script>
+    <link rel="stylesheet" href="css/bootstrap-toggle.min.css">
+    <link rel="stylesheet" href="css/bootstrap-theme.min.css">    
+    <script src="drawedges.js"></script>
+    <script src="InputControls.js"></script>
+    <script src="drawblocks_genes.js"></script>
+    <script src="d3.layout.chord.sort.js"></script>
+    <script src="main.js"></script>
+    <link rel="stylesheet" href="style.css">
+	</head>
+	<body>
+
+    <div style="text-align:center"  id="heading" >
+        <img class="logo" src="logo.png">
+        <h1>Comparative Genomic Analysis Visualization</h1>
+    </div>
+
+    <div style="text-align:center; position:relative;">  
+        <button type="button" class="btn btn-danger" id='chord' onclick="chorddiagram()" style= "border-color: #d43f3a;  border-width: 3px;" >Chord Overview </button>  
+        <button type="button" class="btn btn-danger" id='all' onclick="alledges()" style= "border-color: #d43f3a;  border-width: 3px;" >All Relationships </button>
+        <button type="button"  class="btn btn-danger" id='cross' onclick="crossedges()" style= "border-color: #d43f3a; border-width: 3px;" >Only Cross Relationships</button>
+        <button type="button"   class="btn btn-danger" id='clicked' onclick="clickednodesedges()" style= "border-color: #d43f3a; border-color: #333 ; border-width: 3px;" >Only Filtered Relationships </button>        
+        <button type="button" class="btn btn-danger"  id='reset' onclick="resetfunc()" style= "border-color: #d43f3a; border-width: 3px;" >Reset</button>
+
+        <div class="border2" style=" text-align:center;  display: inline-block; height: 34px;width: 520px; border-color: #d43f3a;border-style: solid"> 
+            <label class="control-label" id="z1" style="display: inline-block; font-size:14px; margin-left: -5px; font-weight: 700;"> Zooming:
+                  <input id="zooming" class="checkbox checkbox-danger"  type="checkbox" unchecked data-toggle="toggle" data-size="small" style= "border-color: #d43f3a;  border-width: 3px;" >
+            </label>
+             <label class="control-label" id="z2" style="display: inline-block;font-size:14px; margin-left: 2px; font-weight: 700;"> Semantic Zooming:
+                  <input id="zooming2" class="checkbox checkbox-danger"  type="checkbox" unchecked data-toggle="toggle" data-size="small" style= "border-color: #d43f3a;  border-width: 3px;" >
+            </label>
+            <label class="control-label" id="z3" style="display: inline-block;font-size:14px; margin-left: 2px; font-weight: 700;"> Selected Zooming:
+                  <input id="zooming3" class="checkbox checkbox-danger"  type="checkbox" unchecked data-toggle="toggle" data-size="small" style= "border-color: #d43f3a;  border-width: 3px;" >
+            </label>
+        </div>
+        <div class="border2" style="    display: inline-block; height: 34px;width: 140px; border-color: #d43f3a;border-style: solid"> 
+          <label class="control-label" id="z1" style="font-size:14px; margin-left: -5px; font-weight: 700;"> Swapping:
+                <input id="dragging" class="checkbox checkbox-danger"  type="checkbox" checked data-toggle="toggle" data-size="small" style= "border-color: #d43f3a;  border-width: 3px;" >
+          </label>
+        </div>
+        <div class="border2" style="    display: inline-block; height: 34px;width: 175px; border-color: #d43f3a;border-style: solid"> 
+          <label class="control-label" id="z1" style="font-size:14px; margin-left: -5px; font-weight: 700;"> Viewport Edges:
+                <input id="viewportedges" class="checkbox checkbox-danger"  type="checkbox" checked data-toggle="toggle" data-size="small" style= "border-color: #d43f3a;  border-width: 3px;" >
+          </label>          
+        </div>
+        <div class="border2" style="    display: inline-block; height: 34px;width: 140px; border-color: #d43f3a;border-style: solid"> 
+          <label class="control-label" id="z1" style="font-size:14px; margin-left: -5px; font-weight: 700;"> Highlights:
+                <input id="mousehighlight" class="checkbox checkbox-danger"  type="checkbox" unchecked data-toggle="toggle" data-size="small" style= "border-color: #d43f3a;  border-width: 3px;" >
+          </label>
+        </div>
+    </div>
+    <div id="vis" class="border22"></div>
+    <div id="foot2" <ul class="footer2" style = "margin: -0px 15px 0 0;border-top: 0px dotted #aaa; padding: 0.5px 0 0 0;  text-align: right;  clear: both;">
+        <li style="display: inline-block; font-size: small;     font-weight: bolder;"><a href='https://kvl.kaust.edu.sa/Pages/Home.aspx'>Created By KAUST Visualization Core Lab, May 2018</a></li>
+        </ul>             
+    </div>
+
+		<script type="text/javascript">		
+    var edgestopath={};
+    var genesneighbours={};var chorddata={};
+    var spinner; var chord=[];
+    var chrtogenes={}; 
+    var genesdata,edgesdata;
+
+    var clickednodes_check= true; var drawonlycrossedge=false;
+    var zooming=false;var dragging=true; var doubleclickedrect=false;
+    var showviewportonlyedges=true; var showmousehighlights=false; var swappingcheck_alledge=false;
+
+    var width = $(window).width()-15;//900;
+    var height = $(window).height()-125;//900; 
+    // console.log(width + " "+ height); 
+    var heightgap=34;//gap between columns rect
+
+    var semanticzoom=false,semanticzoomone=false;var sel_chr="";
+    var x = d3.scale.linear().domain([0, width]).range([0, width]);
+    var y = d3.scale.linear().domain([0, height]).range([0, height]);
+      
+		var svg0 = d3.select("#vis")
+						.append("svg")
+						.attr("width", width)
+						.attr("height", height);      
+    var svg = svg0.append("g").attr("id","topg");  
+
+    var noofcolumns=4;
+    var noofchr=7;
+    var onecolumnwidth = width/noofcolumns;
+    var rectwidth=onecolumnwidth/6;
+    var onerectheight=  (height/noofchr)-heightgap;
+    var bigrectheight= height-heightgap;
+
+    var curvature = .7;
+    var crossedge_threshold=50;
+    var stroke_width_straight="0.4px";
+    var stroke_width_cross="0.8px";
+    var highlighted_edge_stroke_width= "6px";
+    var stroke_opacity_straight=0.2;
+    var stroke_opacity_cross=0.9;
+    var edgehighlightcolor= "red";   var genehighlightcolor="black";
+
+    var gene_opcaity=0.05; var gene_opcaity_allgenes= 0.03;
+    var block_stroke_width="2px";
+
+
+    
+    
+    var color1="rgb(255, 182, 18)", color2 = "#4682B4", color3= " #BA55D3", color4="#3CB371";
+    var colorarr={1:color1, 2:color2, 3:color3, 4:color4}; //1:rgb(233, 71, 44)          rgb(255, 182, 18),     blue"rgb(34, 91, 154)"  greenrgb(19, 72, 45)
+    var colorarr2={"Barley":color1, "WheatA":color2, "WheatB":color3, "WheatD":color4};
+
+    var rectmap= { 11:"hv1H", 12:"hv2H", 13:"hv3H",14:"hv4H",15:"hv5H",16:"hv6H",17:"hv7H", 
+                    21:"ta1A", 22:"ta2A", 23:"ta3A",24:"ta4A",25:"ta5A",26:"ta6A",27:"ta7A",
+                   31:"ta1B", 32:"ta2B", 33:"ta3B",34:"ta4B",35:"ta5B",36:"ta6B",37:"ta7B",
+                   41:"ta1D", 42:"ta2D", 43:"ta3D",44:"ta4D",45:"ta5D",46:"ta6D",47:"ta7D"};
+    var rectmap_ypos={"ta1A": (heightgap/4)+(onerectheight+heightgap)*(0),
+                    "ta2A": (heightgap/4)+(onerectheight+heightgap)*(1),"ta3A": (heightgap/4)+(onerectheight+heightgap)*(2),"ta4A": (heightgap/4)+(onerectheight+heightgap)*(3),
+                    "ta5A": (heightgap/4)+(onerectheight+heightgap)*(4),"ta6A": (heightgap/4)+(onerectheight+heightgap)*(5),"ta7A": (heightgap/4)+(onerectheight+heightgap)*(6),
+                    "ta1B": (heightgap/4)+(onerectheight+heightgap)*(0),"ta2B": (heightgap/4)+(onerectheight+heightgap)*(1),"ta3B": (heightgap/4)+(onerectheight+heightgap)*(2),
+                    "ta4B": (heightgap/4)+(onerectheight+heightgap)*(3),"ta5B": (heightgap/4)+(onerectheight+heightgap)*(4),"ta6B": (heightgap/4)+(onerectheight+heightgap)*(5),
+                    "ta7B": (heightgap/4)+(onerectheight+heightgap)*(6),"ta1D": (heightgap/4)+(onerectheight+heightgap)*(0),"ta2D": (heightgap/4)+(onerectheight+heightgap)*(1),
+                    "ta3D": (heightgap/4)+(onerectheight+heightgap)*(2),"ta4D": (heightgap/4)+(onerectheight+heightgap)*(3),"ta5D": (heightgap/4)+(onerectheight+heightgap)*(4),
+                    "ta6D": (heightgap/4)+(onerectheight+heightgap)*(5),"ta7D": (heightgap/4)+(onerectheight+heightgap)*(6),"hv1H": (heightgap/4)+(onerectheight+heightgap)*(0),
+                    "hv2H": (heightgap/4)+(onerectheight+heightgap)*(1),"hv3H": (heightgap/4)+(onerectheight+heightgap)*(2),"hv4H": (heightgap/4)+(onerectheight+heightgap)*(3),
+                    "hv5H": (heightgap/4)+(onerectheight+heightgap)*(4),"hv6H": (heightgap/4)+(onerectheight+heightgap)*(5),"hv7H": (heightgap/4)+(onerectheight+heightgap)*(6)};
+
+
+    var chrnames=[ "Barley", "WheatA", "WheatB", "WheatD"]; 
+
+    var blockdata= [ {"i":1,j:1, "name":"hv1H"}, {"i":1,j:2, "name":"hv2H"}, {"i":1,j:3, "name":"hv3H"},{"i":1,j:4, "name":"hv4H"},{"i":1,j:5, "name":"hv5H"},{"i":1,j:6, "name":"hv6H"},{"i":1,j:7, "name":"hv7H"}, 
+    {"i":2,j:1, "name":"ta1A"}, {"i":2,j:2, "name":"ta2A"}, {"i":2,j:3, "name":"ta3A"},{"i":2,j:4, "name":"ta4A"},{"i":2,j:5, "name":"ta5A"},{"i":2,j:6, "name":"ta6A"},{"i":2,j:7, "name":"ta7A"},
+    {"i":3,j:1, "name":"ta1B"}, {"i":3,j:2, "name":"ta2B"}, {"i":3,j:3, "name":"ta3B"},{"i":3,j:4, "name":"ta4B"},{"i":3,j:5, "name":"ta5B"},{"i":3,j:6, "name":"ta6B"},{"i":3,j:7, "name":"ta7B"},
+    {"i":4,j:1, "name":"ta1D"}, {"i":4,j:2, "name":"ta2D"}, {"i":4,j:3, "name":"ta3D"},{"i":4,j:4, "name":"ta4D"},{"i":4,j:5, "name":"ta5D"},{"i":4,j:6, "name":"ta6D"},{"i":4,j:7, "name":"ta7D"}];            
+    
+    var chrlengths={"ta1A": 594102056,
+                    "ta2A": 780798557,"ta3A": 750843639,"ta4A": 744588157,
+                    "ta5A": 709773743,"ta6A": 618079260,"ta7A": 736706236,
+                    "ta1B": 689851870,"ta2B": 801256715,"ta3B": 830829764,
+                    "ta4B": 673617499,"ta5B": 713149757,"ta6B": 720988478,
+                    "ta7B": 750620385,"ta1D": 495453186,"ta2D": 651852609,
+                    "ta3D": 615552423,"ta4D": 509857067,"ta5D": 566080677,
+                    "ta6D": 473592718,"ta7D": 638686055,"hv1H": 558535432,
+                    "hv2H": 768075024,"hv3H": 699711114,"hv4H": 647060158,
+                    "hv5H": 670030160,"hv6H": 583380513,"hv7H": 657224000};
+
+    var genetodna={"ta1A":  "WheatA","ta2A": "WheatA","ta3A":  "WheatA","ta4A":  "WheatA",
+                    "ta5A": "WheatA","ta6A":  "WheatA","ta7A":  "WheatA",
+                    "ta1B": "WheatB","ta2B":  "WheatB","ta3B":  "WheatB",
+                    "ta4B": "WheatB","ta5B":  "WheatB","ta6B":  "WheatB",
+                    "ta7B": "WheatB","ta1D":  "WheatD","ta2D":  "WheatD",
+                    "ta3D": "WheatD","ta4D":  "WheatD","ta5D":  "WheatD",
+                    "ta6D": "WheatD","ta7D":  "WheatD","hv1H":  "Barley",
+                    "hv2H": "Barley","hv3H":  "Barley","hv4H":  "Barley",
+                    "hv5H": "Barley","hv6H":  "Barley","hv7H":  "Barley"};
+
+        var chrtonumber={"ta1A":  7,"ta2A":8,"ta3A":  9,"ta4A": 10,
+                    "ta5A": 11,"ta6A":  12,"ta7A":  13,
+                    "ta1B": 14,"ta2B":  15,"ta3B":  16,
+                    "ta4B": 17,"ta5B":  18,"ta6B":  19,
+                    "ta7B": 20,"ta1D":  21,"ta2D":  22,
+                    "ta3D": 23,"ta4D":  24,"ta5D":  25,
+                    "ta6D": 26,"ta7D":  27,"hv1H":  0,
+                    "hv2H": 1,"hv3H":  2,"hv4H":  3,
+                    "hv5H": 4,"hv6H":  5,"hv7H":  6};
+                                    
+    var genetochr={}; var genesinfo={};var chrtogenesneighbor={};
+
+    var opts = {  // spinner config
+      lines: 9, // The number of lines to draw
+      length: 9, // The length of each line
+      width: 7, // The line thickness
+      radius: 14, // The radius of the inner circle
+      color: '#EE3124', // #rgb or #rrggbb or array of colors
+      speed: 1.9, // Rounds per second
+      trail: 70, // Afterglow percentage
+      className: 'spinner', // The CSS class to assign to the spinner
+    };
+    var xposarr=[onecolumnwidth,onecolumnwidth*2,onecolumnwidth*3,onecolumnwidth*4];
+
+                 
+    function zoom() {
+          if((clickednodes_check) && (zooming || semanticzoom || semanticzoomone)){    
+              if(semanticzoomone){
+                svg.selectAll(".blocks").attr("transform", transformblocks);
+                svg.selectAll(".blocktext").attr("transform", transformblocktexts);
+                if(text) { text.attr("transform", transforms);
+                          svg.select("#"+"edgesg").remove();
+                          drawfilteredges(edgesdata,nodename);}
+              }
+              else if(semanticzoom){
+                svg.selectAll(".blocks").attr("transform", transformblock);
+                svg.selectAll(".blocktext").attr("transform", transformblocktext);
+                if(text){ text.attr("transform", transform);
+                         // svg.selectAll(".nodes").attr("fill-opacity", zoom.scale()/10);
+                         svg.select("#"+"edgesg").remove();
+                         drawfilteredges(edgesdata,nodename);}
+              }
+              else  if(zooming){
+                    svg.attr("transform", [
+                      "translate(" + [0, zoom.translate()[1]] + ")",
+                      "scale(" + [1,zoom.scale()] +  ")"
+                    ].join(" "));  
+
+                    // svg.selectAll('.semanticzoom').attr({
+                    //       transform:  "translate(" + [0,zoom.translate()[1] ] + ")" 
+                    //     });  
+                    if(zoom.scale() >1) svg.selectAll('.blocktext').attr("opacity", "0");
+                    else svg.selectAll('.blocktext').attr("opacity", "1");
+              }   
+              if(zoom.scale() > 10) svg.selectAll(".nodes").attr("fill-opacity", function(d) {
+                 if(semanticzoomone && d.Chr == nodename)  return zoom.scale()/100; 
+                 else if(semanticzoom)  return zoom.scale()/100; 
+                 else return gene_opcaity;
+              });
+              else svg.selectAll(".nodes").attr("fill-opacity", gene_opcaity);
+
+              svg.selectAll(".nodes").attr("height", function(d) {
+                if(semanticzoomone && (d.Chr == nodename) && !doubleclickedrect)
+                   return  (d3.scale.linear().domain([1,chrlengths[d.Chr]]).range([1,onerectheight*zoom.scale()])(d.End -d.Start));  //(genesinfo[d.Gene].returnposheight)*zoom.scale(); 
+                else if(semanticzoom && !doubleclickedrect) return  (d3.scale.linear().domain([1,chrlengths[d.Chr]]).range([1,onerectheight*zoom.scale()])(d.End -d.Start));
+                else return (genesinfo[d.Gene].returnposheight);                       
+               })
+         }// if(clickednodes_check && zooming)
+              
+      }
+       var zoom = d3.behavior.zoom().x(x).y(y).scaleExtent([1, Infinity]).on("zoom", zoom);         
+       svg.call(zoom).on("dblclick.zoom", null).on("mousedown.zoom", null);
+
+       function ret_path(srcx,srcy,tarx,tary, src_col_index, tar_col_index){
+          if(src_col_index < tar_col_index){              
+           var x0 = +(srcx) +rectwidth-1 ,
+               x1 = +(tarx)-1,
+               xi = d3.interpolateNumber( x0 , x1 ) ,
+               x2 = xi( curvature ) ,
+               x3 = xi(1 - curvature) ,
+               y0 = srcy,
+               y1 = tary;
+               return "M" + x0 + "," + y0
+                   + "C" + x2 + "," + y0
+                   + " " + x3 + "," + y1
+                   + " " + x1 + "," + y1;          
+          }
+          else if(tar_col_index < src_col_index){              
+             var x0 = +(srcx)-1 ,
+               x1 = +(tarx) +rectwidth-1,
+               xi = d3.interpolateNumber( x0 , x1 ) ,
+               x2 = xi( curvature ) ,
+               x3 = xi(1 - curvature) ,
+               y0 = srcy ,
+               y1 = tary;
+               return "M" + x0 + "," + y0
+                   + "C" + x2 + "," + y0
+                   + " " + x3 + "," + y1
+                   + " " + x1 + "," + y1;
+          }
+       }
+
+       function updategeneinfo(){
+        var d1 = new Date().getTime();
+          genesinfo={};
+          genesdata.forEach(d => { 
+            genesinfo[d.Gene]={"Chr":d.Chr, "Start":d.Start, "End": d.End, "diff": d.End - d.Start, "returnpos": (d3.scale.linear().domain([1,chrlengths[d.Chr]]).range([1,onerectheight*1])(d.Start)),
+                                  "returnposheight": (d3.scale.linear().domain([1,chrlengths[d.Chr]]).range([1,onerectheight*1])(d.End -d.Start)), "color": colorarr2[genetodna[d.Chr]], 
+                                  "ypos": rectmap_ypos[d.Chr] + (d3.scale.linear().domain([1,chrlengths[d.Chr]]).range([1,onerectheight*1])(d.Start)), "species": genetodna[d.Chr],
+                                  "species_col_index": chrnames.indexOf(genetodna[d.Chr]), "xpos":((onecolumnwidth/3)+onecolumnwidth*(chrnames.indexOf(genetodna[d.Chr])))+1  };
+          });
+          edgestopath={};
+          edgesdata.forEach(d => {              
+              edgestopath[d.source+""+d.target]= (ret_path(genesinfo[d.source].xpos, genesinfo[d.source].ypos, genesinfo[d.target].xpos, genesinfo[d.target].ypos, genesinfo[d.source].species_col_index, genesinfo[d.target].species_col_index   ));
+          });
+          var d2 = new Date().getTime();console.log(d2 + " updategeneinfo  "+ (d2-d1)/1000);  
+       }
+// var matrixnew=[       
+// [0, 0, 0, 0, 0, 0, 0, 1683, 0, 22, 0, 2, 0, 0, 1688, 0, 15, 0, 0, 0, 0, 1769, 0, 23, 0, 0, 0, 0],
+// [0, 0, 0, 0, 0, 0, 0, 0, 2269, 0, 1, 0, 12, 0, 0, 2253, 0, 1, 0, 16, 0, 0, 2369, 0, 1, 0, 10, 0],
+// [0, 0, 0, 0, 0, 0, 0, 22, 0, 2103, 0, 0, 0, 0, 32, 0, 2113, 0, 0, 0, 0, 30, 0, 2140, 0, 0, 0, 0],
+// [0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 1459, 263, 0, 0, 0, 3, 0, 1739, 9, 0, 0, 1, 5, 0, 1702, 8, 0, 0],
+// [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 208, 2050, 0, 6, 0, 0, 0, 5, 2338, 0, 3, 0, 0, 0, 4, 2328, 0, 5],
+// [0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 1448, 8, 0, 14, 0, 0, 0, 1470, 13, 7, 9, 0, 0, 4, 1403, 13],
+// [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 53, 6, 5, 1920, 0, 0, 0, 0, 4, 10, 1816, 0, 0, 0, 0, 3, 7, 2208],
+// [1683, 0, 22, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2469, 3, 1, 3, 6, 1, 1, 2503, 2, 3, 1, 7, 0, 3],
+// [0, 2269, 0, 2, 0, 9, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3222, 5, 0, 0, 0, 4, 0, 3296, 2, 1, 2, 0, 3],
+// [22, 0, 2103, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 2993, 2, 0, 0, 3, 6, 1, 3031, 0, 0, 2, 2],
+// [0, 1, 0, 1459, 208, 0, 53, 0, 0, 0, 0, 0, 0, 0, 2, 3, 1, 1918, 271, 3, 7, 1, 1, 2, 1968, 274, 0, 177],
+// [2, 0, 0, 263, 2050, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 6, 4, 360, 2817, 2, 0, 2, 5, 0, 293, 2872, 1, 1],
+// [0, 12, 0, 0, 0, 1448, 5, 0, 0, 0, 0, 0, 0, 0, 0, 2, 4, 0, 0, 2238, 0, 1, 0, 2, 0, 0, 2188, 1],
+// [0, 0, 0, 0, 6, 8, 1920, 0, 0, 0, 0, 0, 0, 0, 3, 0, 4, 2, 0, 8, 2419, 4, 2, 1, 2, 0, 0, 2656],
+// [1688, 0, 32, 0, 0, 0, 0, 2469, 0, 2, 2, 0, 0, 3, 0, 0, 0, 0, 0, 0, 0, 2551, 0, 2, 5, 1, 0, 3],
+// [0, 2253, 0, 3, 0, 14, 0, 3, 3222, 2, 3, 6, 2, 0, 0, 0, 0, 0, 0, 0, 0, 1, 3349, 2, 2, 2, 2, 1],
+// [15, 0, 2113, 0, 0, 0, 0, 1, 5, 2993, 1, 4, 4, 4, 0, 0, 0, 0, 0, 0, 0, 2, 3, 3095, 5, 2, 2, 2],
+// [0, 1, 0, 1739, 5, 0, 0, 3, 0, 2, 1918, 360, 0, 2, 0, 0, 0, 0, 0, 0, 0, 3, 1, 0, 2259, 3, 0, 4],
+// [0, 0, 0, 9, 2338, 0, 4, 6, 0, 0, 271, 2817, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 1, 3247, 0, 2],
+// [0, 16, 0, 0, 0, 1470, 10, 1, 0, 0, 3, 2, 2238, 8, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 2, 1, 2234, 7],
+// [0, 0, 0, 0, 3, 13, 1816, 1, 4, 3, 7, 0, 0, 2419, 0, 0, 0, 0, 0, 0, 0, 4, 1, 1, 2, 19, 0, 2479],
+// [1769, 0, 30, 1, 0, 7, 0, 2503, 0, 6, 1, 2, 1, 4, 2551, 1, 2, 3, 1, 0, 4, 0, 0, 0, 0, 0, 0, 0],
+// [0, 2369, 0, 5, 0, 9, 0, 2, 3296, 1, 1, 5, 0, 2, 0, 3349, 3, 1, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0],
+// [23, 0, 2140, 0, 0, 0, 0, 3, 2, 3031, 2, 0, 2, 1, 2, 2, 3095, 0, 2, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+// [0, 1, 0, 1702, 4, 0, 0, 1, 1, 0, 1968, 293, 0, 2, 5, 2, 5, 2259, 1, 2, 2, 0, 0, 0, 0, 0, 0, 0],
+// [0, 0, 0, 8, 2328, 4, 3, 7, 2, 0, 274, 2872, 0, 0, 1, 2, 2, 3, 3247, 1, 19, 0, 0, 0, 0, 0, 0, 0],
+// [0, 10, 0, 0, 0, 1403, 7, 0, 0, 2, 0, 1, 2188, 0, 0, 2, 2, 0, 0, 2234, 0, 0, 0, 0, 0, 0, 0, 0],
+// [0, 0, 0, 0, 5, 13, 2208, 3, 3, 2, 177, 1, 1, 2656, 3, 1, 2, 4, 2, 7, 2479, 0, 0, 0, 0, 0, 0, 0]
+// ];
+
+</script>
+
+ <script type="text/javascript">
+  $(window).load(function(){ 
+
+   $('#zooming').change(function() {
+     // console.log("z" + $("#zooming").prop('checked') + " "+ $("#dragging").prop('checked') );
+     zoom.scale(1);
+     zoom.translate([0, 0]);
+     zooming= $("#zooming").prop('checked');
+     if(zooming){$("#dragging").prop('checked', false).change();$("#zooming2").prop('checked', false).change();$("#zooming3").prop('checked', false).change();
+                 svg.selectAll("#coltext").selectAll("text").attr("fill", function(d,i){return colorarr[i+1]; sel_chr=""});}
+     if(zooming) svg.call(zoom).on("dblclick.zoom", null);
+   });
+    $('#zooming2').change(function() {
+     // console.log("z" + $("#zooming").prop('checked') + " "+ $("#dragging").prop('checked') );
+     zoom.scale(1);
+     zoom.translate([0, 0]);
+     semanticzoom= $("#zooming2").prop('checked');
+     if(semanticzoom){$("#dragging").prop('checked', false).change();$("#zooming").prop('checked', false).change();$("#zooming3").prop('checked', false).change();
+                       svg.selectAll("#coltext").selectAll("text").attr("fill", function(d,i){return colorarr[i+1]; sel_chr="" });
+     }
+     if(semanticzoom) svg.call(zoom).on("dblclick.zoom", null);
+   });
+     $('#zooming3').change(function() {
+     // console.log("z" + $("#zooming").prop('checked') + " "+ $("#dragging").prop('checked') );
+     zoom.scale(1);
+     zoom.translate([0, 0]);
+     semanticzoomone= $("#zooming3").prop('checked');
+     if(semanticzoomone){$("#dragging").prop('checked', false).change();$("#zooming2").prop('checked', false).change();$("#zooming").prop('checked', false).change();}
+     if(semanticzoomone) svg.call(zoom).on("dblclick.zoom", null);
+   });
+   $('#dragging').change(function() {
+     // console.log( $("#zooming"));
+     dragging= $("#dragging").prop('checked');
+      if(dragging){ $("#zooming").prop('checked', false).change();$("#zooming2").prop('checked', false).change();$("#zooming3").prop('checked', false).change(); sel_chr="";
+                     svg.selectAll("#coltext").selectAll("text").attr("fill", function(d,i){return colorarr[i+1]; });}
+      if(dragging) svg.call(zoom).on("dblclick.zoom", null).on("mousedown.zoom", null);
+   });
+   $('#viewportedges').change(function() {
+     showviewportonlyedges = $("#viewportedges").prop('checked');
+   });
+   $('#mousehighlight').change(function() {
+     showmousehighlights = $("#mousehighlight").prop('checked');
+   });
+  });
+
+ 
+  $(document).ready(function() {
+    var d1 = new Date().getTime();
+    spinner = new Spinner(opts).spin(document.getElementById("vis"));
+    drawblocks();   
+
+      d3.tsv("TempAnomolies.tsv", function(data) {    
+          genesdata = data;
+          genesdata.forEach(d => {   
+              if(chrtogenes[d.Chr]){ //chr already exists
+                var arr = chrtogenes[d.Chr];
+                arr.push(d.Gene);
+              }
+              else { //chr not exists
+                //var tmparr = [d.Gene];
+                chrtogenes[d.Chr]=[d.Gene];
+              }
+
+              genesinfo[d.Gene]={"Chr":d.Chr, "Start":d.Start, "End": d.End, "diff": d.End - d.Start, "returnpos": (d3.scale.linear().domain([1,chrlengths[d.Chr]]).range([1,onerectheight*1])(d.Start)),
+                                  "returnposheight": (d3.scale.linear().domain([1,chrlengths[d.Chr]]).range([1,onerectheight*1])(d.End -d.Start)), "color": colorarr2[genetodna[d.Chr]], 
+                                  "ypos": rectmap_ypos[d.Chr] + (d3.scale.linear().domain([1,chrlengths[d.Chr]]).range([1,onerectheight*1])(d.Start)), "species": genetodna[d.Chr],
+                                  "species_col_index": chrnames.indexOf(genetodna[d.Chr]), "xpos":((onecolumnwidth/3)+onecolumnwidth*(chrnames.indexOf(genetodna[d.Chr])))+1  };
+              chrtogenesneighbor[d.Chr]=[];
+              chorddata[chrtonumber[d.Chr]]= Array(28).fill(0);
+          });
+        // console.log(genesinfo["HORVU1Hr1G000010.3"]);          
+
+          d3.tsv("edges.tsv", function(data) {  
+             // console.log(data);       
+              edgesdata= data;
+              edgesdata.forEach(d => { 
+                if(genesneighbours[d.source]){
+                  var arr = genesneighbours[d.source];
+                  if(arr.indexOf(d.target) == -1) arr.push(d.target);
+                }
+                else {
+                  genesneighbours[d.source]=[d.target];
+                }
+
+                if(genesneighbours[d.target]){
+                  var arr = genesneighbours[d.target];
+                  if(arr.indexOf(d.source) == -1) arr.push(d.source);
+                }
+                else{
+                  genesneighbours[d.target]=[d.source];
+                }
+
+                if(chrtogenesneighbor[genesinfo[d.source].Chr]) {
+                  var t= chrtogenesneighbor[genesinfo[d.source].Chr];
+                  t.push(d.target); 
+                }
+                if(chrtogenesneighbor[genesinfo[d.target].Chr]) {
+                  var t= chrtogenesneighbor[genesinfo[d.target].Chr];
+                  t.push(d.source); 
+                }
+
+                // if(chorddata[genesinfo[d.source].Chr]) {
+                //   var t= chorddata[genesinfo[d.source].Chr];
+                //   if(t[genesinfo[d.target].Chr]){
+                //     t[genesinfo[d.target].Chr]++;
+                //   }
+                //   else {
+                //     t[genesinfo[d.target].Chr]=1;
+                //   }  
+                // }
+                // if(chorddata[genesinfo[d.target].Chr]) {
+                //   var t= chorddata[genesinfo[d.target].Chr];
+                //   if(t[genesinfo[d.source].Chr]){
+                //     t[genesinfo[d.source].Chr]++;
+                //   }
+                //   else {
+                //     t[genesinfo[d.source].Chr]=1;
+                //   }  
+                // }
+                if(chorddata[chrtonumber[genesinfo[d.source].Chr]]) {
+                  var t= chorddata[chrtonumber[genesinfo[d.source].Chr]];
+                    t[chrtonumber[genesinfo[d.target].Chr] ]++;
+ 
+                }
+                if(chorddata[chrtonumber[genesinfo[d.target].Chr]]) {
+                  var t= chorddata[chrtonumber[genesinfo[d.target].Chr]];
+                  t[chrtonumber[genesinfo[d.source].Chr] ]++;
+                    
+                }          
+
+                edgestopath[d.source+""+d.target]= (ret_path(genesinfo[d.source].xpos, genesinfo[d.source].ypos, genesinfo[d.target].xpos, genesinfo[d.target].ypos, genesinfo[d.source].species_col_index, genesinfo[d.target].species_col_index     ));
+              }); 
+              // console.log(chorddata);
+              var keys=Object.keys(chorddata);
+              // console.log(keys);
+              for(var i=0; i<keys.length;i++){
+                // console.log(chrtogenesneighbor[keys[i]]);
+                var arr= chorddata[keys[i]];
+                arr = arr.map(function(x) { 
+                  if (x<10) return x * 30; 
+                  else if(x<100) return x * 10; 
+                  else return x;
+                });
+                chord.push(arr);
+              }
+              // console.log(chord);              
+              spinner.stop();  
+              var d2 = new Date().getTime();console.log(d2 + " initial  "+ (d2-d1)/1000);
+          }); //edges.tsv
+      });  //temp.tsv 
+      
+  });
+  </script>
+	</body>
+</html>
