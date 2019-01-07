@@ -17,7 +17,7 @@ function drawfilteredges(data,sourcenode){
       } 
     }
    }
-
+    var temce=0;
     svg.append( "g" ).attr("id","edgesg").selectAll( "links23" )
                  .data( edgesfilterdata )
                  .enter()
@@ -26,8 +26,8 @@ function drawfilteredges(data,sourcenode){
                  .attr("d", function(d){return link(d)})
                  // .attr("class","edges")
                  .style( "stroke-width" , function(d){
-                          // if( Math.abs(svg.select("#" + d.source.replace(".", "_"))["0"]["0"].transform.animVal["0"].matrix.f - svg.select("#" + d.target.replace(".", "_"))["0"]["0"].transform.animVal["0"].matrix.f ) >100) return "1px";
-                          if(Math.abs(genesinfo[d.target].ypos - genesinfo[d.source].ypos) >crossedge_threshold) return stroke_width_cross;
+                          if(Math.abs(genesinfo[d.target].ypos - genesinfo[d.source].ypos) >crossedge_threshold) {
+                            temce++;if(highlightcrossedges) return stroke_width_cross_highlight;  else return stroke_width_cross;}
                           else return stroke_width_straight;
                        } )
                  // .style( "stroke" , function(d,i){ //console.log(svg.select("#" + d.target.replace(".", "_")));
@@ -39,7 +39,8 @@ function drawfilteredges(data,sourcenode){
                  .style("fill","transparent")
                  .style( "opacity" , function(d){
                           // if( Math.abs(svg.select("#" + d.source.replace(".", "_"))["0"]["0"].transform.animVal["0"].matrix.f - svg.select("#" + d.target.replace(".", "_"))["0"]["0"].transform.animVal["0"].matrix.f ) >100) return 1;
-                          if(Math.abs(genesinfo[d.target].ypos - genesinfo[d.source].ypos)>crossedge_threshold) return stroke_opacity_cross;
+                          if(Math.abs(genesinfo[d.target].ypos - genesinfo[d.source].ypos)>crossedge_threshold){
+                            if(highlightcrossedges) return stroke_opacity_cross_highlight; else return stroke_opacity_cross;}
                           else return stroke_opacity_straight;
                         } )
                  .on( "mouseover" , edgemouseover )
@@ -49,6 +50,8 @@ function drawfilteredges(data,sourcenode){
                  .text(function(d) { return d.source + " "+ d.target; });
               
     svg.select("#" + "edgesg").moveToBack();
+    TotalEdges_displayed=edgesfilterdata.length; TotalCEdges_displayed=temce;
+    analytics();
     // svg.select("#" + "blockstext").moveToFront();
     // var d2 = new Date().getTime();console.log(d2 + " edges drawn  "+ (d2-d1)/1000); 
 }
@@ -63,7 +66,7 @@ function drawedges(data){
           var temp={"source":d.source, "target":d.target};
           filter_data.push(temp);
     });
-
+    var temce=0;
     svg.append( "g" ).attr("id","edgesg").selectAll( "links23" )
                  .data( filter_data )
                  .enter()
@@ -71,13 +74,18 @@ function drawedges(data){
                  .attr("class","links23")
                  .attr("d", function(d){return link_all(d)})
                  // .attr("class","edges")
-                 .style( "stroke-width" , stroke_width_straight)
+                 .style( "stroke-width" , function(d){
+                          if(Math.abs(genesinfo[d.target].ypos - genesinfo[d.source].ypos) >crossedge_threshold) {
+                            if(highlightcrossedges) return stroke_width_cross_highlight;  else return stroke_width_cross;}
+                          else return stroke_width_straight;
+                       })
                  // .style( "stroke" , function(d,i){return svg.select("#" + d.target.replace(".", "_"))["0"]["0"].attributes[4].value} ) // with rect stroke attribute 7genesinfo[d.Gene].color
                  .style( "stroke" , function(d){return genesinfo[d.target].color; })
                  .style("fill","transparent")
                  .style( "opacity" , function(d){
                           // if( Math.abs(svg.select("#" + d.source.replace(".", "_"))["0"]["0"].transform.animVal["0"].matrix.f - svg.select("#" + d.target.replace(".", "_"))["0"]["0"].transform.animVal["0"].matrix.f ) >100) return 1;
-                          if(Math.abs(genesinfo[d.target].ypos - genesinfo[d.source].ypos )>crossedge_threshold) return stroke_opacity_cross;
+                          if(Math.abs(genesinfo[d.target].ypos - genesinfo[d.source].ypos )>crossedge_threshold) {
+                            temce++;if(highlightcrossedges) return stroke_opacity_cross_highlight; else return stroke_opacity_cross;}
                           else return stroke_opacity_straight;
                         })
                  // .on( "mouseover" , edgemouseover )
@@ -86,6 +94,8 @@ function drawedges(data){
                  // .text(function(d) { return d.source + " "+ d.target; });        
     
     svg.select("#" + "edgesg").moveToBack();
+    TotalEdges_displayed=filter_data.length; TotalCEdges_displayed=temce;
+    analytics();
     // svg.select("#" + "blockstext").moveToFront();
     var d2 = new Date().getTime();console.log(d2 + " all edges  "+ (d2-d1)/1000);
 }
@@ -177,6 +187,8 @@ function edgemouseout(d){
 
 function drawedges_cross(data){
   // var d1 = new Date().getTime();
+  TotalEdges_displayed=data.length; TotalCEdges_displayed=data.length;
+  analytics();
     svg.append( "g" ).attr("id","edgesg").selectAll( "links23" )
                  .data( data )
                  .enter()

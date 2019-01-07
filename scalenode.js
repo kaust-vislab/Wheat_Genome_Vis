@@ -39,7 +39,7 @@
 				 prevent = true;
 				 chrdblclicked(n);
 				 })        
-				 .style( "stroke-width" , block_stroke_width );
+				 .style( "stroke-width" , function(d){ return bw(crossedgesdata_sum[d.name]); } );//block_stroke_width
 
 		svgb.append("g").attr("id", "blockstext").selectAll("text")
 			.data(blockdata.filter(function(d){
@@ -102,6 +102,7 @@
     //console.log(firstNeighbour + " "+ secondNeighbour);
 
     genetochr={};
+    TotalGenes_displayed = dat.length;
     text=svg.append("g").attr("id","genesg").selectAll("rect")
       // .data(data.filter(function(d){ 
       //   if(genetodna[d.Chr] == firstNeighbour || genetodna[d.Chr] == secondNeighbour || d.Chr == sourcenode) return true; // for drawing genes and all genes of its neighbors species

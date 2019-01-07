@@ -2,13 +2,16 @@ var timer = [];
 var delay = 200;
 var svgb;
 var prevent = false;
+// var bw = d3.scale.linear().domain([0,4600]).range([1, 5]); // scale for blocks stroke width acc to cross edges
+var bw = d3.scale.linear().domain([0, 100,200,500,1000,1500,2000,4600]).range([1,1.1,1.5,2,2.5,3,4, 6]); // scale for blocks stroke width acc to cross edges
+// var freq_arr={"gene1": 20, "gene2": 10,"gene3": 30,"gene4": 40,"gene5": 35};
  function drawblocks(){
       if(svg.select("#blocks"))svg.select("#blocks").remove();   
       svg.selectAll("#coltext").remove();svg.selectAll("#blockstext").remove();
        svgb= svg.append("g").attr("id", "blocks");   
-           svgb.selectAll("rect")
-                .data(blockdata)
-                .enter()
+          svgb.selectAll("rect")
+              .data(blockdata)
+              .enter()
               .append("rect")
               .attr("id", function(d){return rectmap[+(""+d.i+d.j)]})               
               // .attr("x", (onecolumnwidth/3)+onecolumnwidth*(i-1))
@@ -36,7 +39,7 @@ var prevent = false;
                 prevent = true;
                 chrdblclicked(n);
               })        
-              .style( "stroke-width" , block_stroke_width );
+              .style( "stroke-width" , function(d){ return bw(crossedgesdata_sum[d.name]); } );//block_stroke_width
 
 
            svgb.append("g").attr("id", "blockstext").selectAll("text")
@@ -51,6 +54,23 @@ var prevent = false;
                     .style("text-anchor", "start")
                     .style("font-size", "20px")
                     .style("font-weight", "700")
+                     .on("mouseover", function(d,i) {
+                         d3.select(this).style("fill", function(d){return colorarr2[genetodna[d.name]]}); 
+                         var ce=chorddata_crossedges[chrtonumber[d.name]];
+                         var ce_list={};
+                         for(var u=0;u<ce.length;u++){
+                          if(ce[u] !==0)ce_list[numbertochr[u]]=ce[u];
+                         }
+                         // console.log(ce);console.log(ce_list);
+                         // wordcloud(ce_list, d3.transform(this.getAttribute("transform")).translate[0], d3.transform(this.getAttribute("transform")).translate[1]); 
+                         drawWordCloud(ce_list, d3.transform(this.getAttribute("transform")).translate[0], d3.transform(this.getAttribute("transform")).translate[1]); 
+
+                         // console.log(transformblocktext(d) + "  "+ d3.transform(this.getAttribute("transform")).translate);             
+                    }) 
+                    .on("mouseout", function(d,i) { 
+                         d3.select(this).style("fill",  "black");
+                         if(svg.select("#wordcloud"))svg.select("#wordcloud").remove();
+                    }) 
                     .text(function(d){ return rectmap[+(""+d.i+d.j)]}) ;   
         //}
           svgb.append("g").attr("id", "coltext").selectAll("text")
@@ -71,6 +91,7 @@ var prevent = false;
                     .text(function(d){ return d}) ;
 
       //}
+      TotalGenes_displayed = 0; TotalEdges_displayed =0;  TotalCEdges_displayed =0;    analytics();
   }    
       // var xposarr=[onecolumnwidth,onecolumnwidth*2,onecolumnwidth*3,onecolumnwidth*4];
 
@@ -136,6 +157,7 @@ var prevent = false;
         var t2=colorarr[p1+1];
         colorarr[p1+1] = colorarr[p2+1];
         colorarr[p2+1]=t2;
+        // console.log(colorarr);
 
         // var t3=colorarr2[p1+1];
         // colorarr2[p1+1] = colorarr2[p2+1];
@@ -178,13 +200,13 @@ var prevent = false;
         var to= svg.select("#" + d.Chr)["0"]["0"].attributes[8].value;
         t=to.slice(9, to.length);
         var xv= +t.slice(1, t.indexOf(","))
-        var yv= +t.slice( t.indexOf(",")+1,t.indexOf(")"));       
+        var yv= +t.slice( t.indexOf(",")+1,t.indexOf(")"));   //console.log(doubleclickedrect+ "  "+ d.Chr + " "+ genetodna[d.Chr]+ "  selectedchr=="+ sel_chr);        
           if(doubleclickedrect && d.Chr == nodename){  
             if(genetodna[d.Chr] == sel_chr) return "translate(" + (xv+1) + "," + ( (yv)+returnpos_onebig(d.Chr, d.Start,zoom.scale()) ) + ")"; 
             else return "translate(" + (xv+1) + "," + ( (yv)+returnpos_onebig(d.Chr, d.Start,1) ) + ")"; 
           }
           // else if(genetodna[d.Chr] == sel_chr) return "translate(" + (xv+1) + "," + ( (yv)+returnpos(d.Chr, d.Start,zoom.scale()) ) + ")";
-          // else return "translate(" + (xv+1) + "," + ( (yv)+returnpos(d.Chr, d.Start,1) ) + ")";     
+          // else return "translate(" + (xv+1) + "," + ( (yv)+returnpos(d.Chr, d.Start,1) ) + ")";           
           else if(genetodna[d.Chr] == sel_chr) return "translate(" + (xv+1) + "," + ( (yv)+ (genesinfo[d.Gene].returnpos)*zoom.scale() ) + ")";
           else return "translate(" + (xv+1) + "," + ( (yv)+ (genesinfo[d.Gene].returnpos)*1 ) + ")";    
       }
@@ -226,7 +248,6 @@ var prevent = false;
       }
       
       var text;
-     // d3.tsv("TempAnomolies.tsv", function(data) { //Anomolies
       function drawgenes(data){  
         var d1 = new Date().getTime();
         var dat=[]; 
@@ -240,6 +261,7 @@ var prevent = false;
                  if(cond) dat.push({"Chr":d.Chr, "Gene": d.Gene, "Start":d.Start,"End":d.End});
             }
         });
+        TotalGenes_displayed = dat.length;
         text=svg.append("g").attr("id","genesg").selectAll("rect")
           .data(dat)
           .enter()
@@ -256,7 +278,8 @@ var prevent = false;
           // .on( "mouseover" , nodemouseover)
           // .on( "mouseout" , nodemouseout)
           // .attr("class","nodes");//.01
-        
+        text2=text.append("svg:title")
+          .text(function(d) { return d.Gene + "\n" + sample_gene; });
         var d2 = new Date().getTime();console.log(d2 + " allgenes  "+ (d2-d1)/1000);      
       };
 
@@ -275,7 +298,7 @@ var prevent = false;
           if(genetodna[genesinfo[td[i]].Chr] == firstNeighbour || genetodna[genesinfo[td[i]].Chr] == secondNeighbour || genesinfo[td[i]].Chr == sourcenode)
              dat.push({"Chr":genesinfo[td[i]].Chr, "Gene": td[i], "Start":genesinfo[td[i]].Start,"End":genesinfo[td[i]].End});
         }
-
+        TotalGenes_displayed = dat.length;
         // genetochr={};
         text=svg.append("g").attr("id","genesg").selectAll("rect")
           .data(dat)
@@ -293,16 +316,32 @@ var prevent = false;
           .attr("fill-opacity", gene_opcaity)//.01          
           .attr("class","nodes")
           .on( "mouseover" , nodemouseover)
-          .on( "mouseout" , nodemouseout);       
+          .on( "mouseout" , nodemouseout)
+          .on("click", function(d,i) { 
+                var txt = '';
+                var xmlhttp = new XMLHttpRequest();
+                xmlhttp.onreadystatechange = function(){
+                  if(xmlhttp.status == 200 && xmlhttp.readyState == 4){
+                    txt = xmlhttp.responseText;
+                    // console.log(txt);
+                    var myWindow = window.open("", "_blank", "left=0,top=0,width=700,height=700");
+                    myWindow.document.write("<title>Gene Detail</title> <center><b><h2>"+ d.Gene+ "</b></h2></center>  <br /><br />" + "<p>"+ txt + "</p>");
+                    myWindow.document.close();
+                  }
+                };
+                xmlhttp.open("GET","samplegene.txt",true);
+                xmlhttp.send();
+                
+          });       
           
           text2=text.append("svg:title")
-          .text(function(d) { return d.Gene; });
+          .text(function(d) { return d.Gene+ "\n" + sample_gene; });
           // var d2 = new Date().getTime();console.log(d2 + " genes  "+ (d2-d1)/1000);     
       };
 
       
       function nodemouseover(d){
-        if(!showmousehighlights) return;
+        if(!showmousehighlights) return;        
 
         d3.select(this).style( "fill-opacity" , "1" );
         d3.select(this).style( "stroke" , genehighlightcolor );
@@ -369,12 +408,13 @@ var prevent = false;
             spinner.spin(document.getElementById("vis"));
             nodename = d;//d3.select(this)["0"]["0"].id; 
            // console.log("click  "+d3.select(this)["0"]["0"].id);  
-           doubleclickedrect=false;          
+           doubleclickedrect=false;   check_doubleclickrect =false;    sel_chr="";      
             setTimeout(function() {
                 if(svg.select("#edgesg"))svg.select("#edgesg").remove();        
                 if(svg.select("#genesg"))svg.select("#genesg").remove();
                 svg.selectAll('.zoomi').attr("transform",d3.zoomIdentity);
                 svg.attr("transform",d3.zoomIdentity);
+                d3.select("#topg").attr("transform", "translate(" + (translatetopg_val) + "," + (0) + ")");
                 zoom.scale(1);
                 zoom.translate([0, 0])
                 drawblocks();
@@ -393,12 +433,13 @@ var prevent = false;
             spinner.spin(document.getElementById("vis"));
             nodename = d;//d3.select(this)["0"]["0"].id; 
             //console.log(nodename);    
-            doubleclickedrect=true;   sel_chr="";     
+            doubleclickedrect=true;  check_doubleclickrect =true;  sel_chr="";     
              setTimeout(function() {
                 if(svg.select("#edgesg"))svg.select("#edgesg").remove();        
                 if(svg.select("#genesg"))svg.select("#genesg").remove();
                 svg.selectAll('.zoomi').attr("transform",d3.zoomIdentity);
                 svg.attr("transform",d3.zoomIdentity);
+                d3.select("#topg").attr("transform", "translate(" + (translatetopg_val) + "," + (0) + ")");
                 zoom.scale(1);
                 zoom.translate([0, 0])
                 drawblocks_onebig(d);
@@ -406,7 +447,7 @@ var prevent = false;
                  drawfiltergenes_onebig(genesdata,nodename);
                  drawfilteredges(edgesdata,nodename);
                  spinner.stop();
-                 var d2 = new Date().getTime();console.log(d2 + " chr dblclicked  "+ (d2-d1)/1000);
+                 var d2 = new Date().getTime();console.log(d2 + " chr dblclicked  "+ (d2-d1)/1000 );
              },1);  
         }    
       } 
@@ -414,6 +455,7 @@ var prevent = false;
       function drawgenes_cross(data){  
         // var d1 = new Date().getTime();
         // genetochr={};
+        TotalGenes_displayed = data.length;
         text=svg.append("g").attr("id","genesg").selectAll("rect")
           .data(data)
           .enter()
@@ -434,10 +476,81 @@ var prevent = false;
           .attr("class","nodes");//.01
         
         text2=text.append("svg:title")
-          .text(function(d) { return d.Gene; });
+          .text(function(d) { return d.Gene+ "\n" + sample_gene; });
         // var d2 = new Date().getTime();console.log(d2 + " allgenes  "+ (d2-d1)/1000);      
       };
 
+
+function analytics(){
+if(svg.select("#analyticsg"))svg.select("#analyticsg").remove();
+var textcolor="black";
+var svgan = svg.append("g")
+     .attr("id", "analyticsg")
+     .attr("transform", "translate(" + (width-Math.abs(translatetopg_val*3)+20) + "," + (height-150)+ ")");
+
+svgan.append("rect")
+     .attr("x", -4)
+     .attr("y", 0)
+     .attr("width", Math.abs(translatetopg_val*3)+20)
+     .attr("height", 140)
+     .attr("fill", "white" )
+     .attr("fill-opacity", 0)
+     .attr("stroke", "#d43f3a")
+     .attr("stroke-width", "2px")
+     .attr("stroke-opacity", 1);         
+              
+
+svgan.append("text")
+     .attr("x", (Math.abs(translatetopg_val*3)+20)/2)
+     .attr("y", 0)
+     .attr("dy", "1.2em")
+     .style("text-anchor", "middle")
+     .attr("font-size", "24px")
+     .attr("font-weight", "bold")
+     .attr("fill", "#d43f3a")
+     .text("Analytics");
+
+svgan.append("text")
+     .attr("x", 0)
+     .attr("y", 35)
+     .attr("dy", "1.2em")
+     .style("text-anchor", "start")
+     .attr("font-size", "16px")
+     .attr("font-weight", "bold")
+     .attr("fill", textcolor)
+     .text("Blocks:"+ ((inexploredet == true)? (svg.select("#blocks")["0"]["0"].childNodes.length-1) : (svg.select("#blocks")["0"]["0"].childNodes.length-2)) ) ;
+              
+svgan.append("text")
+     .attr("x", 0)
+     .attr("y", 60)
+     .attr("dy", "1.2em")
+     .style("text-anchor", "start")
+     .attr("font-size", "16px")
+     .attr("font-weight", "bold")
+     .attr("fill", textcolor)
+     .text("Genes:"+ TotalGenes_displayed);
+
+svgan.append("text")
+     .attr("x", 0)
+     .attr("y", 85)
+     .attr("dy", "1.2em")
+     .style("text-anchor", "start")
+     .attr("font-size", "16px")
+     .attr("font-weight", "bold")
+     .attr("fill", textcolor)
+     .text("Edges:" + TotalEdges_displayed);
+
+svgan.append("text")
+     .attr("x", 0)
+     .attr("y", 110)
+     .attr("dy", "1.2em")
+     .style("text-anchor", "start")
+     .attr("font-size", "16px")
+     .attr("font-weight", "bold")
+     .attr("fill", textcolor)
+     .text("Cross Edges:" + TotalCEdges_displayed);          
+
+}
 
 
       //drawgenes attrs

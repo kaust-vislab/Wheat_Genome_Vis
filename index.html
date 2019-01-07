@@ -3,13 +3,27 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Comparative Vis</title>
-		<script type="text/javascript" src="js/d3/d3.min.js"></script>
-    <script  src="https://code.jquery.com/jquery-2.2.4.min.js"  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="  crossorigin="anonymous"></script>
-    <script src='https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.0.1/spin.min.js'></script> 
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>    
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-zoom/1.7.1/d3-zoom.js"></script>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+		<!-- <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script> -->
+    <script type="text/javascript" src="js/d3/d3.min.js"></script>
+    <!-- <script  src="https://code.jquery.com/jquery-2.2.4.min.js"  integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="  crossorigin="anonymous"></script> -->
+    <script type="text/javascript" src="js/jquery-2.2.4.min.js"></script>
+    <!-- <script src='https://code.jquery.com/ui/1.11.4/jquery-ui.js'></script>  -->
+    <script src='js/jquery-ui.js'></script> 
+    <!-- <script src='https://cdnjs.cloudflare.com/ajax/libs/spin.js/2.0.1/spin.min.js'></script>  -->
+    <script src='js/spin.min.js'></script>
+    <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>   -->
+    <script src="js/bootstrap.min.js"></script>   
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-zoom/1.7.1/d3-zoom.js"></script> -->
+    <script src="js/d3-zoom.js"></script>
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
+    <link rel="stylesheet" href="js/bootstrap.min.css">
+    <!-- <link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css" rel = "stylesheet"> -->
+    <link href = "css/jquery-ui.css" rel = "stylesheet">
     <script src="https://d3js.org/d3-selection-multi.v1.min.js"></script>
+    <script src="simpleD3Slider.js"></script>
+    <script src="js/wordcloud.js"></script>
+    <!-- <script src="js/vendor/d3.layout.cloud.js"></script> -->
+    <script src="js/cloud.js"></script>
     <script src="scalenode.js"></script>
     <script src="js/vendor/bootstrap-toggle.min.js"></script>
     <link rel="stylesheet" href="css/bootstrap-toggle.min.css">
@@ -19,65 +33,152 @@
     <script src="drawblocks_genes.js"></script>
     <script src="d3.layout.chord.sort.js"></script>
     <script src="main.js"></script>
+    <script src="removeblocks_help.js"></script>
+    <script src="drawblocks_details.js"></script>
     <link rel="stylesheet" href="style.css">
 	</head>
 	<body>
 
     <div style="text-align:center"  id="heading" >
         <img class="logo" src="logo.png">
-        <h1>Comparative Genomic Analysis Visualization</h1>
+        <h1>Wheat Genome Comparative Visual Analysis</h1>
     </div>
 
-    <div style="text-align:center; position:relative;">  
-        <button type="button" class="btn btn-danger" id='chord' onclick="chorddiagram()" style= "border-color: #d43f3a;  border-width: 3px;" >Chord Overview </button>  
-        <button type="button" class="btn btn-danger" id='all' onclick="alledges()" style= "border-color: #d43f3a;  border-width: 3px;" >All Relationships </button>
-        <button type="button"  class="btn btn-danger" id='cross' onclick="crossedges()" style= "border-color: #d43f3a; border-width: 3px;" >Only Cross Relationships</button>
-        <button type="button"   class="btn btn-danger" id='clicked' onclick="clickednodesedges()" style= "border-color: #d43f3a; border-color: #333 ; border-width: 3px;" >Only Filtered Relationships </button>        
-        <button type="button" class="btn btn-danger"  id='reset' onclick="resetfunc()" style= "border-color: #d43f3a; border-width: 3px;" >Reset</button>
+    <div style="text-align:center; position:relative;"> 
 
-        <div class="border2" style=" text-align:center;  display: inline-block; height: 34px;width: 520px; border-color: #d43f3a;border-style: solid"> 
-            <label class="control-label" id="z1" style="display: inline-block; font-size:14px; margin-left: -5px; font-weight: 700;"> Zooming:
+        <div class="dropdown" style="    display: inline-block;">
+          <button class="btn btn-danger dropdown-toggle" type="button"id="exploredet" data-toggle="dropdown" 
+                  aria-haspopup="true" aria-expanded="true" style="height :34px; width:165px;   border-color: #d43f3a;  border-width: 3px;outline-color: transparent;"> Explore Details <span class="caret"></span>
+          </button>            
+          <ul id="drop" class="dropdown-menu checkbox-menu22 allow-focus111" aria-labelledby="exploredet" style="min-width:165px ; text-align:left;">              
+          </ul>
+        </div>  
+
+        <button type="button" class="btn btn-danger" id='chord' onclick="chorddiagram()" style= "height :34px;border-color: #d43f3a;  border-width: 3px; outline-color: transparent;" >Overview </button>  
+        <button type="button" class="btn btn-danger" id='all' onclick="alledges()" style= "height :34px;border-color: #d43f3a;  border-width: 3px;outline-color: transparent;" >All Relationships </button>
+        <button type="button"  class="btn btn-danger" id='cross' onclick="crossedges()" style= "height :34px;border-color: #d43f3a; border-width: 3px;outline-color: transparent;" >Cross Relationships</button>
+        <button type="button"   class="btn btn-danger" id='clicked' onclick="clickednodesedges()" style= "height :34px;border-color: #d43f3a; border-color: #333 ; border-width: 3px;outline-color: transparent;" >Filtered Relationships </button>        
+        <button type="button" class="btn btn-danger"  id='reset' onclick="resetfunc()" style= "height :34px;border-color: #d43f3a; border-width: 3px;outline-color: transparent;" >Reset</button>  
+
+             
+
+        <div class="dropdown" style="    display: inline-block;">
+          <button class="btn btn-danger dropdown-toggle" type="button"id="dropdownMenu1" data-toggle="dropdown" 
+                  aria-haspopup="true" aria-expanded="true" style="height :34px; width:176px;   border-color: #d43f3a;  border-width: 3px;outline-color: transparent;"> Zooming Options 
+                  <!-- <i class="glyphicon glyphicon-zoom-in"></i> -->
+                  <span class="caret"></span>
+          </button>
+            
+          <ul class="dropdown-menu checkbox-menu allow-focus" aria-labelledby="dropdownMenu1" style="min-width:100px ; text-align:center;">  
+            <li >
+              <label class="control-label" id="z1" style="display: inline-block; font-size:14px; margin-left: 0px; font-weight: 700; padding: 5px 5px;"> Normal Zoom:
+                <input id="zooming" class="checkbox checkbox-danger"  type="checkbox" unchecked data-toggle="toggle" data-size="small" style= "border-color: #d43f3a;  border-width: 5px;" >
+              </label>
+            </li>
+            
+            <li >
+               <label class="control-label" id="z2" style="display: inline-block;font-size:14px; margin-left: 0px; font-weight: 700;padding: 5px 5px;"> Semantic Zoom:
+            <input id="zooming2" class="checkbox checkbox-danger"  type="checkbox" unchecked data-toggle="toggle" data-size="small" style= "border-color: #d43f3a;  border-width: 5px;" >
+                </label>
+            </li>
+            
+            <li >
+              <label class="control-label" id="z3" style="display: inline-block;font-size:14px; margin-left: 0px; font-weight: 700;padding: 5px 5px;"> Column Zoom:
+              <input id="zooming3" class="checkbox checkbox-danger"  type="checkbox" unchecked data-toggle="toggle" data-size="small" style= "border-color: #d43f3a;  border-width: 5px;" >
+               </label>
+            </li>            
+          </ul>
+        </div>    
+        <!-- <div class="border2" style=" text-align:center;  display: inline-block; height: 34px;width: 415px; border-color: #d43f3a;border-style: solid"> 
+            <label class="control-label" id="z1" style="display: inline-block; font-size:13px; margin-left: 0px; font-weight: 700;"> Zoom:
                   <input id="zooming" class="checkbox checkbox-danger"  type="checkbox" unchecked data-toggle="toggle" data-size="small" style= "border-color: #d43f3a;  border-width: 3px;" >
             </label>
-             <label class="control-label" id="z2" style="display: inline-block;font-size:14px; margin-left: 2px; font-weight: 700;"> Semantic Zooming:
+             <label class="control-label" id="z2" style="display: inline-block;font-size:13px; margin-left: 0px; font-weight: 700;"> Semantic Zoom:
                   <input id="zooming2" class="checkbox checkbox-danger"  type="checkbox" unchecked data-toggle="toggle" data-size="small" style= "border-color: #d43f3a;  border-width: 3px;" >
             </label>
-            <label class="control-label" id="z3" style="display: inline-block;font-size:14px; margin-left: 2px; font-weight: 700;"> Selected Zooming:
+            <label class="control-label" id="z3" style="display: inline-block;font-size:13px; margin-left: 0px; font-weight: 700;"> Column Zoom:
                   <input id="zooming3" class="checkbox checkbox-danger"  type="checkbox" unchecked data-toggle="toggle" data-size="small" style= "border-color: #d43f3a;  border-width: 3px;" >
             </label>
-        </div>
-        <div class="border2" style="    display: inline-block; height: 34px;width: 140px; border-color: #d43f3a;border-style: solid"> 
-          <label class="control-label" id="z1" style="font-size:14px; margin-left: -5px; font-weight: 700;"> Swapping:
+        </div> -->
+
+        <div class="border2" style="    display: inline-block; height: 35px;width: 125px; border-color: #d43f3a;border-style: solid">
+          <label class="control-label" id="z1" style="font-size:13px; margin-left: 1px; font-weight: 700;"> Color:
+          <select id="colordropdown" class="dropdown1" onchange="colorthemechange(this)"  style ="width:72px; margin-top: 1px;background: indianred; color: #333; border-width: thick; font-size: 12px;height: 26px; border: 1px solid; border-color: indianred;border-radius: 4px;">
+                                       <option id ="ss" class="dropdown-item1" value="t1" style = "">Theme 1</option>
+                                       <option class="dropdown-item1" value="t2" style = "">Theme 2</option>
+                                       <option class="dropdown-item1" value="t3" style = "">Theme 3</option>
+           </select>
+        </div>  
+
+        <div class="border2" style="    display: inline-block; height: 34px;width: 128px; border-color: #d43f3a;border-style: solid"> 
+          <label class="control-label" id="z1" style="font-size:13px; margin-left: 0px; font-weight: 700;"> Swapping:
                 <input id="dragging" class="checkbox checkbox-danger"  type="checkbox" checked data-toggle="toggle" data-size="small" style= "border-color: #d43f3a;  border-width: 3px;" >
           </label>
         </div>
-        <div class="border2" style="    display: inline-block; height: 34px;width: 175px; border-color: #d43f3a;border-style: solid"> 
-          <label class="control-label" id="z1" style="font-size:14px; margin-left: -5px; font-weight: 700;"> Viewport Edges:
+        <div class="border2" style="    display: inline-block; height: 34px;width: 165px; border-color: #d43f3a;border-style: solid"> 
+          <label class="control-label" id="z1" style="font-size:13px; margin-left: 0px; font-weight: 700;"> Viewport Edges:
                 <input id="viewportedges" class="checkbox checkbox-danger"  type="checkbox" checked data-toggle="toggle" data-size="small" style= "border-color: #d43f3a;  border-width: 3px;" >
           </label>          
         </div>
-        <div class="border2" style="    display: inline-block; height: 34px;width: 140px; border-color: #d43f3a;border-style: solid"> 
-          <label class="control-label" id="z1" style="font-size:14px; margin-left: -5px; font-weight: 700;"> Highlights:
+        <div class="border2" style="    display: inline-block; height: 34px;width: 150px; border-color: #d43f3a;border-style: solid"> 
+          <label class="control-label" id="z1" style="font-size:13px; margin-left: 0px; font-weight: 700;"> Mouse Hover:
                 <input id="mousehighlight" class="checkbox checkbox-danger"  type="checkbox" unchecked data-toggle="toggle" data-size="small" style= "border-color: #d43f3a;  border-width: 3px;" >
           </label>
         </div>
+        <div class="border2" style="    display: inline-block; height: 34px;width: 210px; border-color: #d43f3a;border-style: solid"> 
+          <label class="control-label" id="z1" style="font-size:13px; margin-left: 0px; font-weight: 700;">Highlight CrossEdges:
+                <input id="highlightcross" class="checkbox checkbox-danger"  type="checkbox" unchecked data-toggle="toggle" data-size="small" style= "border-color: #d43f3a;  border-width: 3px;" >
+          </label>
+        </div>
+        <div class="border2" style="    display: inline-block; height: 35px;width: 150px;     margin-left: -2.5px;  "> 
+                <div><input type='textbox' id='textbox1' placeholder="Search genes" data-size="small" style = "width: 145px;height: 35px; margin-top: -5px;outline-color: transparent;box-shadow: none; border-color: #d43f3a;border-width: 2.2px; border-style: solid; border-radius: 5px;"> </div>         
+        </div>
+        <!-- <div class="search-cont" id="search-cont" > 
+                <div><input type='textbox' id='search-text' class="search-text" placeholder="Search genes" data-size="small" > </div>         
+        </div>
+ -->
     </div>
-    <div id="vis" class="border22"></div>
-    <div id="foot2" <ul class="footer2" style = "margin: -0px 15px 0 0;border-top: 0px dotted #aaa; padding: 0.5px 0 0 0;  text-align: right;  clear: both;">
-        <li style="display: inline-block; font-size: small;     font-weight: bolder;"><a href='https://kvl.kaust.edu.sa/Pages/Home.aspx'>Created By KAUST Visualization Core Lab, September 2018</a></li>
+    <div id="vis" class="border22">
+          <label class="control-label" id="labeld" style="display:none; position:absolute; font-size:13px; margin-left: 0px; font-weight: 700;"> Show Only Cross Edges:
+                <input id="detail_crossedges" class="checkbox checkbox-danger"  type="checkbox" unchecked data-toggle="toggle" data-size="small" style= "border-color: #d43f3a;  border-width: 3px;" >
+          </label>
+
+          <label class="control-label" id="labeld2" style="display:none; position:absolute;font-size:13px; margin-left: 0px; font-weight: 700;"> Layout of the Blocks:
+              <select id="layoutdropdown" class="dropdown1" onchange="layoutchange(this)"  style ="width:72px; margin-top: 1px;background: indianred; color: #333; border-width: thick; font-size: 12px;height: 26px; border: 1px solid; border-color: indianred;border-radius: 4px;">
+                                           <option id ="ss" class="dropdown-item1" value="n" style = "">Normal</option>
+                                           <option class="dropdown-item1" value="r" style = "">Repeat</option>                                       
+               </select>
+          </label>
+          <div id="removechr" class="dropdown" style=" display: none;position:absolute;">
+            <button class="btn btn-danger dropdown-toggle" type="button"id="removechr1" data-toggle="dropdown" 
+                  aria-haspopup="true" aria-expanded="true" style="  height :34px; width:205px;   border-color: #d43f3a;  border-width: 3px;outline-color: transparent;"> Remove Selected Blocks <span class="caret"></span> </button>                 
+              <ul id="dropblocks" class="dropdown-menu checkbox-menu23 allow-focus" aria-labelledby="removechr1" style="min-width:205px ; text-align:left;"></ul>
+          </div>    
+          
+
+    </div>
+    <div id="foot2" <ul class="footer2" style = "margin: -4px 15px 0 0;border-top: 0px dotted #aaa; padding: 0.5px 0 0 0;  text-align: right;  clear: both;">
+        <li style="display: inline-block; font-size: small;     font-weight: bolder;"><a href='https://kvl.kaust.edu.sa/Pages/Home.aspx'>Created By KAUST Visualization Core Lab, January 2019</a></li>
         </ul>             
     </div>
 
-		<script type="text/javascript">		
+		<script type="text/javascript">	
+
+    var sample_gene= "cccatcccccaaccccatgacaggccccagtgtgtgatggtccccttcctgtgtccaagtgttctcattgttcacttcc";
+    // cacctatgagtgagaatatgcggtgtttggttttttgtccttgcgatagtttgctgagaatgatggtttccagcttaatccatgtccctacaaaggacatgaactcatccttttttatggctgcatagtattacatgatgtatatgtgccacattttcttaatccactctatcattgatggacatttgggttggttccaagtatttgctattgtgaatagtgccacaataaacatacgtgtgcatgtgtctttatagcaacatgattcataatcctttgggtatatacccagtaatgggatggctgggtcaaatggtatttctagttctagatccttgaggaatcgccacactgtcttccacaatggtcgaaccagtttacagtcctaccaacagtgtgaaagtgttcctatttctctacatcctctccagcatctgttgtttcctgactttttaatgatcgacattctaactggtgtgagatggtatctcattgtggttttgatttgtacttctctgatggccactgatgatgagcattttttcgtgtgtctattggctacataaatgtcttcctttgagaagtgtctgttcatatcctttgttcactttttgatggggttgtttgtttttttcttctaaatttgtttgagttctttgtagattctggatattaaccctttgtcagatgagtagattgcaaaaattgtctcccattctgtaggttgcctgttcactctgatggtagtttcttttgccgtgcagaagctctttagtttaattagatcccatttgtcaattttcgcttttgttgccattgct";
+	
+    var translatetopg_val=-50;
+    var TotalGenes_displayed=0; var TotalEdges_displayed=0; var TotalCEdges_displayed=0;
     var edgestopath={};
-    var genesneighbours={};var chorddata={};
-    var spinner; var chord=[];
+    var genesneighbours={};var chorddata={}; var chorddata_crossedges={};
+    var spinner; var chord=[]; var chord_crossedges=[]; var chordforhover=[];
     var chrtogenes={}; 
     var genesdata,edgesdata;
+    var exploredet_name="";
 
     var clickednodes_check= true; var drawonlycrossedge=false;
-    var zooming=false;var dragging=true; var doubleclickedrect=false;
-    var showviewportonlyedges=true; var showmousehighlights=false; var swappingcheck_alledge=false;
+    var zooming=false;var dragging=true; var doubleclickedrect=false; var check_doubleclickrect=false;
+    var showviewportonlyedges=true; var showmousehighlights=false; var swappingcheck_alledge=false; var highlightcrossedges=false;
 
     var width = $(window).width()-15;//900;
     var height = $(window).height()-125;//900; 
@@ -91,8 +192,10 @@
 		var svg0 = d3.select("#vis")
 						.append("svg")
 						.attr("width", width)
-						.attr("height", height);      
-    var svg = svg0.append("g").attr("id","topg");  
+						.attr("height", height);
+            // .attr("transform", "translate(" + (0) + "," + (100) + ")");   
+    var svg = svg0.append("g").attr("id","topg")
+                              .attr("transform", "translate(" + (translatetopg_val) + "," + (0) + ")");  
 
     var noofcolumns=4;
     var noofchr=7;
@@ -102,18 +205,21 @@
     var bigrectheight= height-heightgap;
 
     var curvature = .7;
-    var crossedge_threshold=50;
+    var crossedge_threshold=10;  //50 originally
     var stroke_width_straight="0.4px";
     var stroke_width_cross="0.8px";
     var highlighted_edge_stroke_width= "6px";
     var stroke_opacity_straight=0.2;
     var stroke_opacity_cross=0.9;
+    var stroke_width_cross_highlight ="3px" ; var stroke_opacity_cross_highlight=1;
     var edgehighlightcolor= "red";   var genehighlightcolor="black";
 
     var gene_opcaity=0.05; var gene_opcaity_allgenes= 0.03;
     var block_stroke_width="2px";
 
-
+// for pre calculating cross edges based on crossedge_threshold var
+    var edge_cross_data=[], genes_cross_data=[]; var tem=[];
+    var inalledge=false; var inoverview=false; var inexploredet=false;
     
     
     var color1="rgb(255, 182, 18)", color2 = "#4682B4", color3= " #BA55D3", color4="#3CB371";
@@ -164,7 +270,7 @@
                     "hv2H": "Barley","hv3H":  "Barley","hv4H":  "Barley",
                     "hv5H": "Barley","hv6H":  "Barley","hv7H":  "Barley"};
 
-        var chrtonumber={"ta1A":  7,"ta2A":8,"ta3A":  9,"ta4A": 10,
+     var chrtonumber={"ta1A":  7,"ta2A":8,"ta3A":  9,"ta4A": 10,
                     "ta5A": 11,"ta6A":  12,"ta7A":  13,
                     "ta1B": 14,"ta2B":  15,"ta3B":  16,
                     "ta4B": 17,"ta5B":  18,"ta6B":  19,
@@ -173,8 +279,15 @@
                     "ta6D": 26,"ta7D":  27,"hv1H":  0,
                     "hv2H": 1,"hv3H":  2,"hv4H":  3,
                     "hv5H": 4,"hv6H":  5,"hv7H":  6};
-                                    
+     var numbertochr={"0":  "hv1H", "1": "hv2H", "2": "hv3H","3": "hv4H", "4": "hv5H", "5":  "hv6H", "6":  "hv7H",
+                     "7":  "ta1A", "8":"ta2A", "9":  "ta3A", "10": "ta4A", "11": "ta5A", "12":  "ta6A", "13":  "ta7A",
+                     "14":  "ta1B", "15":"ta2B", "16":  "ta3B", "17": "ta4B", "18": "ta5B", "19":  "ta6B", "20":  "ta7B",
+                     "21":  "ta1D", "22":"ta2D", "23":  "ta3D", "24": "ta4D", "25": "ta5D", "26":  "ta6D", "27":  "ta7D"                     
+                     };
+    var sbcdata=[]; var crossedgestotarget={};                
     var genetochr={}; var genesinfo={};var chrtogenesneighbor={};
+    var crossedgesdata_sum={};
+    // var chrtorelchr={}; var chrtorelchr_amount={};
 
     var opts = {  // spinner config
       lines: 9, // The number of lines to draw
@@ -190,25 +303,32 @@
 
                  
     function zoom() {
-          if((clickednodes_check) && (zooming || semanticzoom || semanticzoomone)){    
+      // var d1 = new Date().getTime();
+      // console.log("zoom starts"+ d1);
+          if((clickednodes_check || drawonlycrossedge) && (zooming || semanticzoom || semanticzoomone)){    
               if(semanticzoomone){
+               if(sel_chr.length <1){  alert("Please select a column by clicking on its text at the bottom for zooming."); return;}
                 svg.selectAll(".blocks").attr("transform", transformblocks);
                 svg.selectAll(".blocktext").attr("transform", transformblocktexts);
                 if(text) { text.attr("transform", transforms);
-                          svg.select("#"+"edgesg").remove();
-                          drawfilteredges(edgesdata,nodename);}
+                          // svg.select("#"+"edgesg").remove();
+                          // drawfilteredges(edgesdata,nodename);
+                           svg.selectAll(".links23").attr("d", function(d){return link(d)}); // just update edges link method on zoom
+                        }
               }
               else if(semanticzoom){
                 svg.selectAll(".blocks").attr("transform", transformblock);
                 svg.selectAll(".blocktext").attr("transform", transformblocktext);
                 if(text){ text.attr("transform", transform);
                          // svg.selectAll(".nodes").attr("fill-opacity", zoom.scale()/10);
-                         svg.select("#"+"edgesg").remove();
-                         drawfilteredges(edgesdata,nodename);}
+                         // svg.select("#"+"edgesg").remove();
+                         // drawfilteredges(edgesdata,nodename);
+                         svg.selectAll(".links23").attr("d", function(d){return link(d)}); // just update edges link method on zoom
+                        }
               }
               else  if(zooming){
                     svg.attr("transform", [
-                      "translate(" + [0, zoom.translate()[1]] + ")",
+                      "translate(" + [translatetopg_val, zoom.translate()[1]] + ")",
                       "scale(" + [1,zoom.scale()] +  ")"
                     ].join(" "));  
 
@@ -232,7 +352,44 @@
                 else return (genesinfo[d.Gene].returnposheight);                       
                })
          }// if(clickednodes_check && zooming)
-              
+          else if((inexploredet) && (zooming || semanticzoom || semanticzoomone)){    
+              if(semanticzoomone){
+                svg.selectAll(".blocks").attr("transform", transformblocks_det);
+                svg.selectAll(".blocktext").attr("transform", transformblocktexts_det);
+                if(text){ text.attr("transform", transforms_det);
+                           svg.selectAll(".links23").attr("d", function(d){return link_det(d)}); // just update edges link method on zoom
+                        }
+              }
+              else if(semanticzoom){
+                svg.selectAll(".blocks").attr("transform", transformblock_det);
+                svg.selectAll(".blocktext").attr("transform", transformblocktext_det);
+                if(text){ text.attr("transform", transform_det);
+                         svg.selectAll(".links23").attr("d", function(d){return link_det(d)}); // just update edges link method on zoom
+                        }
+              }
+              else  if(zooming){
+                    svg.attr("transform", [
+                      "translate(" + [translatetopg_val, zoom.translate()[1]] + ")",
+                      "scale(" + [1,zoom.scale()] +  ")"
+                    ].join(" "));   
+                    if(zoom.scale() >1) svg.selectAll('.blocktext').attr("opacity", "0");
+                    else svg.selectAll('.blocktext').attr("opacity", "1");
+              }   
+              if(zoom.scale() > 10) svg.selectAll(".nodes").attr("fill-opacity", function(d) {
+                 if(semanticzoomone && d.Chr == exploredet_name)  return zoom.scale()/100; 
+                 else if(semanticzoom)  return zoom.scale()/100; 
+                 else return gene_opcaity;
+              });
+              else svg.selectAll(".nodes").attr("fill-opacity", gene_opcaity);
+
+              svg.selectAll(".nodes").attr("height", function(d) {
+                if(semanticzoomone && (d.Chr == exploredet_name))
+                   return  (d3.scale.linear().domain([1,chrlengths[d.Chr]]).range([1,onerectheight*zoom.scale()])(d.End -d.Start));  //
+                else if(semanticzoom ) return  (d3.scale.linear().domain([1,chrlengths[d.Chr]]).range([1,onerectheight*zoom.scale()])(d.End -d.Start));
+                else return (genesinfo[d.Gene].returnposheight);                       
+               })
+         }// if(clickednodes_check && zooming)
+         // var d2 = new Date().getTime();console.log("zoom ends "+ (d2-d1)/1000 );     
       }
        var zoom = d3.behavior.zoom().x(x).y(y).scaleExtent([1, Infinity]).on("zoom", zoom);         
        svg.call(zoom).on("dblclick.zoom", null).on("mousedown.zoom", null);
@@ -316,7 +473,6 @@
 
  <script type="text/javascript">
   $(window).load(function(){ 
-
    $('#zooming').change(function() {
      // console.log("z" + $("#zooming").prop('checked') + " "+ $("#dragging").prop('checked') );
      zoom.scale(1);
@@ -324,7 +480,8 @@
      zooming= $("#zooming").prop('checked');
      if(zooming){$("#dragging").prop('checked', false).change();$("#zooming2").prop('checked', false).change();$("#zooming3").prop('checked', false).change();
                  svg.selectAll("#coltext").selectAll("text").attr("fill", function(d,i){return colorarr[i+1]; sel_chr=""});}
-     if(zooming) svg.call(zoom).on("dblclick.zoom", null);
+     if(zooming & !inexploredet) svg.call(zoom).on("dblclick.zoom", null);
+     else if(inexploredet) svg.call(zoom).on("dblclick.zoom", null).on("mousedown.zoom", null);
    });
     $('#zooming2').change(function() {
      // console.log("z" + $("#zooming").prop('checked') + " "+ $("#dragging").prop('checked') );
@@ -334,7 +491,8 @@
      if(semanticzoom){$("#dragging").prop('checked', false).change();$("#zooming").prop('checked', false).change();$("#zooming3").prop('checked', false).change();
                        svg.selectAll("#coltext").selectAll("text").attr("fill", function(d,i){return colorarr[i+1]; sel_chr="" });
      }
-     if(semanticzoom) svg.call(zoom).on("dblclick.zoom", null);
+     if(semanticzoom  & !inexploredet) svg.call(zoom).on("dblclick.zoom", null);
+     else if(inexploredet) svg.call(zoom).on("dblclick.zoom", null).on("mousedown.zoom", null);
    });
      $('#zooming3').change(function() {
      // console.log("z" + $("#zooming").prop('checked') + " "+ $("#dragging").prop('checked') );
@@ -342,14 +500,16 @@
      zoom.translate([0, 0]);
      semanticzoomone= $("#zooming3").prop('checked');
      if(semanticzoomone){$("#dragging").prop('checked', false).change();$("#zooming2").prop('checked', false).change();$("#zooming").prop('checked', false).change();}
-     if(semanticzoomone) svg.call(zoom).on("dblclick.zoom", null);
+     if(semanticzoomone  & !inexploredet) svg.call(zoom).on("dblclick.zoom", null);
+     else if(inexploredet) svg.call(zoom).on("dblclick.zoom", null).on("mousedown.zoom", null);
    });
    $('#dragging').change(function() {
      // console.log( $("#zooming"));
      dragging= $("#dragging").prop('checked');
       if(dragging){ $("#zooming").prop('checked', false).change();$("#zooming2").prop('checked', false).change();$("#zooming3").prop('checked', false).change(); sel_chr="";
                      svg.selectAll("#coltext").selectAll("text").attr("fill", function(d,i){return colorarr[i+1]; });}
-      if(dragging) svg.call(zoom).on("dblclick.zoom", null).on("mousedown.zoom", null);
+      if(dragging & !inexploredet) svg.call(zoom).on("dblclick.zoom", null);
+      else if(inexploredet) svg.call(zoom).on("dblclick.zoom", null).on("mousedown.zoom", null);
    });
    $('#viewportedges').change(function() {
      showviewportonlyedges = $("#viewportedges").prop('checked');
@@ -357,13 +517,97 @@
    $('#mousehighlight').change(function() {
      showmousehighlights = $("#mousehighlight").prop('checked');
    });
-  });
+   $('#highlightcross').change(function() {    
+    // console.log("in change hce "+$("#highlightcross").prop('checked') + " "+ clickednodes_check+ " "+ inexploredet + " "+ highlightcrossedges);
+     highlightcrossedges = $("#highlightcross").prop('checked');
+     if(inalledge) alledges();
+     else if(clickednodes_check) {
+       if(!check_doubleclickrect && nodename  && nodename.length>1) chrclicked(nodename);
+       else if(check_doubleclickrect && nodename && nodename.length>1) chrdblclicked(nodename);
+       else clickednodesedges();
+     }
+     else if(inexploredet){onexploredetail(exploredet_name,"check");}
+   });
+
+   $('#textbox1').change(function() {
+      //console.log($('#textbox1').val())
+      var str = $('#textbox1').val();
+      var found=false;
+      if(str.length>12){ 
+       d3.selectAll('g#genesg').selectAll("rect") //here's how you get all the nodes
+       .each(function(d,i) {
+         if(this.id.length >0){ 
+            if((this.id.toLowerCase().replace("_", ".")).includes(str.toLowerCase())){
+               // console.log(this.id + " "+ this.id.length + " "+ str ); 
+               // console.log(d);
+               d3.select(this).moveToFront();
+               d3.select(this).call(animateFirstSteprect);
+               found=true;
+             }
+              else 
+                {                 
+                  d3.select(this).transition().delay(0).duration(1)
+                                  .attr("fill-opacity", gene_opcaity )
+                                  .style( "stroke-width" , "0px" )
+                                  .style( "stroke" , "none" );
+                }
+          } 
+       });  //.each
+          if(!found) alert("Gene not found or currently not displayed");
+       }//if
+       else if(str.length==0){
+         d3.selectAll('g#genesg').selectAll("rect") //here's how you get all the nodes
+               .each(function(d,i) {
+                 if(this.id.length >0)
+                    d3.select(this).transition().delay(0).duration(1)
+                                   .attr("fill-opacity", gene_opcaity )
+                                   .style( "stroke-width" , "0px" )
+                                   .style( "stroke" , "none" );
+               });
+       }
+       else alert("Enter longer string to search");
+   })
+  
+   var keys=Object.keys(numbertochr);
+   for(var i=0; i<keys.length;i++){  
+      addCheckbox(numbertochr[keys[i]]);     
+   }
+
+   $(document).on('click', '.allow-focus', function (e) {
+     e.stopPropagation();
+   });
+
+    $(".checkbox-menu22").on("change", "input[type='checkbox']", function() {
+      // console.log($('#dropblocks').empty());
+      $(this).closest("li")["0"].style.backgroundColor ="#5aa8f6";
+      svg.call(zoom).on("dblclick.zoom", null).on("mousedown.zoom", null);
+      if($(this).prop('checked')) {
+        $("#exploredet").html("Explore Details: " + $(this).val()  + " <span class=\"caret\"></span>");
+        onexploredetail($(this).val(), "check");
+      }
+       else {
+         $("#exploredet").html("Explore Details " + "" + "<span class=\"caret\"></span>");
+         $(this).closest("li")["0"].style.backgroundColor ="transparent";
+         onexploredetail($(this).val(), "uncheck");
+       }
+   });
+
+   // to turn other checkbox to uncheck
+   $('input:checkbox').click(function() {
+    // console.log("index click cb"); console.log($(this));
+       $('input:checkbox').not(".checkbox.checkbox-danger").not(this).prop('checked', false);
+     var templi= $('input:checkbox').not(".checkbox.checkbox-danger").not(this).closest("li");
+     for (var l=0;l<templi.length;l++){
+      templi[l].style.backgroundColor ="transparent";
+     }
+   });   
+});
 
  
   $(document).ready(function() {
     var d1 = new Date().getTime();
     spinner = new Spinner(opts).spin(document.getElementById("vis"));
-    drawblocks();   
+    // drawblocks();    
 
       d3.tsv("TempAnomolies.tsv", function(data) {    
           genesdata = data;
@@ -382,7 +626,10 @@
                                   "ypos": rectmap_ypos[d.Chr] + (d3.scale.linear().domain([1,chrlengths[d.Chr]]).range([1,onerectheight*1])(d.Start)), "species": genetodna[d.Chr],
                                   "species_col_index": chrnames.indexOf(genetodna[d.Chr]), "xpos":((onecolumnwidth/3)+onecolumnwidth*(chrnames.indexOf(genetodna[d.Chr])))+1  };
               chrtogenesneighbor[d.Chr]=[];
+              // chrtorelchr[d.Chr]=[];
+              // chrtorelchr_amount[d.Chr]={};
               chorddata[chrtonumber[d.Chr]]= Array(28).fill(0);
+              chorddata_crossedges[chrtonumber[d.Chr]]= Array(28).fill(0);
           });
         // console.log(genesinfo["HORVU1Hr1G000010.3"]);          
 
@@ -435,36 +682,87 @@
                 // }
                 if(chorddata[chrtonumber[genesinfo[d.source].Chr]]) {
                   var t= chorddata[chrtonumber[genesinfo[d.source].Chr]];
-                    t[chrtonumber[genesinfo[d.target].Chr] ]++;
- 
+                    t[chrtonumber[genesinfo[d.target].Chr] ]++; 
                 }
                 if(chorddata[chrtonumber[genesinfo[d.target].Chr]]) {
                   var t= chorddata[chrtonumber[genesinfo[d.target].Chr]];
-                  t[chrtonumber[genesinfo[d.source].Chr] ]++;
-                    
+                  t[chrtonumber[genesinfo[d.source].Chr] ]++;                    
                 }          
 
                 edgestopath[d.source+""+d.target]= (ret_path(genesinfo[d.source].xpos, genesinfo[d.source].ypos, genesinfo[d.target].xpos, genesinfo[d.target].ypos, genesinfo[d.source].species_col_index, genesinfo[d.target].species_col_index     ));
+
+
+                if(Math.abs(genesinfo[d.target].ypos - genesinfo[d.source].ypos) >crossedge_threshold){
+                    if(chorddata_crossedges[chrtonumber[genesinfo[d.source].Chr]]) {
+                      var t= chorddata_crossedges[chrtonumber[genesinfo[d.source].Chr]];
+                        t[chrtonumber[genesinfo[d.target].Chr] ]++; 
+                    }
+                    if(chorddata_crossedges[chrtonumber[genesinfo[d.target].Chr]]) {
+                      var t= chorddata_crossedges[chrtonumber[genesinfo[d.target].Chr]];
+                      t[chrtonumber[genesinfo[d.source].Chr] ]++;                    
+                    }    
+                }
+
+                // precomputing cross edges
+                    // edge_cross_data=[]; genes_cross_data=[]; tem=[]; //need it when we will add this threshold interactive filter
+                    var source_col_index = chrnames.indexOf(genesinfo[d.source].species);
+                    var target_col_index = chrnames.indexOf(genesinfo[d.target].species);                    
+                    if(source_col_index==-1 || target_col_index==-1 || Math.abs(target_col_index- source_col_index) >1) return; 
+                    if(Math.abs(genesinfo[d.target].ypos - genesinfo[d.source].ypos) <crossedge_threshold) return;
+                    var temp={"source":d.source, "target":d.target};
+                    edge_cross_data.push(temp);
+                    if(! tem.includes(d.source)){
+                     tem.push(d.source);
+                     var temp={"Chr":genesinfo[d.source].Chr, "Gene":d.source, "Start":genesinfo[d.source].Start  , "End":genesinfo[d.source].End};
+                     genes_cross_data.push(temp);
+                    }
+                    if(! tem.includes(d.target)){
+                     tem.push(d.target);
+                     var temp={"Chr":genesinfo[d.target].Chr, "Gene":d.target, "Start":genesinfo[d.target].Start  , "End":genesinfo[d.target].End};
+                     genes_cross_data.push(temp);
+                    }
               }); 
+              // console.log(genes_cross_data);
               // console.log(chorddata);
+              //generate 28x28 array              
               var keys=Object.keys(chorddata);
               // console.log(keys);
               for(var i=0; i<keys.length;i++){
                 // console.log(chrtogenesneighbor[keys[i]]);
                 var arr= chorddata[keys[i]];
+                var arr2 = chorddata_crossedges[keys[i]];
+                var sum = arr2.reduce(function(a, b) { return a + b; }, 0);
+                /////////////////////////////////////////////////////////////
+                // console.log(keys[i]+ " "+ arr2); //for stacked bar chart
+                 var tarr={};
+                 tarr["year"] = numbertochr[keys[i]];
+                 crossedgesdata_sum[numbertochr[keys[i]]] = sum;
+                for (var j=0; j<arr2.length;j++){
+                  // console.log(arr2[j] + "   "+numbertochr[keys[i]]);
+                  tarr[numbertochr[keys[j]]] = arr2[j];
+                  // if(arr2[j] != 0) crossedgestotarget[arr2[j]]=numbertochr[keys[i]] + " <-> "+ numbertochr[keys[j]] ;//not using now
+                }
+                sbcdata.push(tarr);
+                /////////////////////////////////////////////////////////////////
+
+                chord_crossedges.push(arr2);
+                chordforhover.push(arr);
                 arr = arr.map(function(x) { 
-                  if (x<10) return x * 30; 
-                  else if(x<100) return x * 10; 
+                  if (x<10) return x * 30; // x * 30
+                  else if(x<100) return x * 10; //x * 10
                   else return x;
                 });
                 chord.push(arr);
               }
-              // console.log(chord);              
+              // console.log(crossedgesdata_sum);
+              // console.log(chord);  //console.log(chordforhover); 
+              // console.log(chord_crossedges);           
               spinner.stop();  
               var d2 = new Date().getTime();console.log(d2 + " initial  "+ (d2-d1)/1000);
+              // chorddiagram();
+              drawblocks();
           }); //edges.tsv
-      });  //temp.tsv 
-      
+      });  //temp.tsv       
   });
   </script>
 	</body>
